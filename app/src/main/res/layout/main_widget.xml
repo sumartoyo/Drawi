@@ -1,0 +1,87 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/widget_margin">
+
+    <Button
+        android:id="@+id/button123"
+        android:layout_width="70dp"
+        android:layout_height="60dp"
+        android:textSize="14sp"
+        android:layout_above="@+id/buttonGHI"
+        android:layout_toLeftOf="@+id/buttonABC"
+        android:text="123" />
+
+    <Button
+        android:id="@+id/buttonABC"
+        android:layout_width="70dp"
+        android:layout_height="60dp"
+        android:textSize="14sp"
+        android:layout_centerHorizontal="true"
+        android:layout_above="@+id/buttonJKL"
+        android:text="ABC" />
+
+    <Button
+        android:id="@+id/buttonDEF"
+        android:layout_width="70dp"
+        android:layout_height="60dp"
+        android:textSize="14sp"
+        android:layout_above="@+id/buttonMNO"
+        android:layout_toRightOf="@+id/buttonABC"
+        android:text="DEF" />
+
+    <Button
+        android:id="@+id/buttonGHI"
+        android:layout_width="70dp"
+        android:layout_height="60dp"
+        android:textSize="14sp"
+        android:layout_centerVertical="true"
+        android:layout_toLeftOf="@+id/buttonJKL"
+        android:text="GHI" />
+
+    <Button
+        android:id="@+id/buttonJKL"
+        android:layout_width="70dp"
+        android:layout_height="60dp"
+        android:textSize="14sp"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:text="JKL" />
+
+    <Button
+        android:id="@+id/buttonMNO"
+        android:layout_width="70dp"
+        android:layout_height="60dp"
+        android:textSize="14sp"
+        android:layout_centerVertical="true"
+        android:layout_toRightOf="@+id/buttonJKL"
+        android:text="MNO" />
+
+    <Button
+        android:id="@+id/buttonPQRS"
+        android:layout_width="70dp"
+        android:layout_height="60dp"
+        android:textSize="14sp"
+        android:layout_below="@+id/buttonGHI"
+        android:layout_toLeftOf="@+id/buttonTUV"
+        android:text="PQRS" />
+
+    <Button
+        android:id="@+id/buttonTUV"
+        android:layout_width="70dp"
+        android:layout_height="60dp"
+        android:textSize="14sp"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/buttonJKL"
+        android:text="TUV" />
+
+    <Button
+        android:id="@+id/buttonWXYZ"
+        android:layout_width="70dp"
+        android:layout_height="60dp"
+        android:textSize="14sp"
+        android:layout_below="@+id/buttonMNO"
+        android:layout_toRightOf="@+id/buttonTUV"
+        android:text="WXYZ" />
+
+</RelativeLayout>
