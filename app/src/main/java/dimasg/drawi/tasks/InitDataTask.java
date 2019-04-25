@@ -54,28 +54,14 @@ public class InitDataTask extends NiceAsyncTask<Void, Void> {
         List<ResolveInfo> infoList = pm.queryIntentActivities(mainIntent, 0);
 
         infoMap = new HashMap();
-        Map<String, String> labelMap = new HashMap();
         for (ResolveInfo info : infoList) {
             if (info.activityInfo.packageName.equals(context.getApplicationContext().getPackageName())) {
                 continue;
             }
-
-            String label = info.loadLabel(pm).toString();
-            labelMap.put(info.activityInfo.name, label);
-
-            char prefix = label.toUpperCase().charAt(0);
-            if (category == "123") {
-                if (prefix < 'A' || prefix > 'Z') {
-                    infoMap.put(info.activityInfo.name, info);
-                }
-            } else {
-                if (prefix >= category.charAt(0) && prefix <= category.charAt(category.length() - 1)) {
-                    infoMap.put(info.activityInfo.name, info);
-                }
-            }
+            infoMap.put(info.activityInfo.name, info);
         }
 
-        loadMetaMap(category);
+        loadMetaMap();
 
         // remove uninstalled
         String[] keys = new String[metaMap.size()];
@@ -89,34 +75,46 @@ public class InitDataTask extends NiceAsyncTask<Void, Void> {
         for (String key : infoMap.keySet()) {
             ResolveInfo info = infoMap.get(key);
             Long timestamp = new File(info.activityInfo.applicationInfo.sourceDir).lastModified();
-
-            Meta newMeta = null;
-            if (!metaMap.containsKey(key)) {
-                newMeta = new Meta();
-            } else {
-                Meta meta = metaMap.get(key);
-                if (Long.compare(meta.timestamp, timestamp) != 0) {
-                    newMeta = meta;
+            Meta meta = metaMap.containsKey(key) ? metaMap.get(key) : null;
+            if (meta != null) {
+                if (Long.compare(meta.timestamp, timestamp) == 0) {
+                    continue; // app isn't modified, use cache
                 }
             }
 
-            if (newMeta == null) continue;
+            if (meta == null) {
+                meta = new Meta();
+            }
+            meta.label = info.loadLabel(pm).toString();
 
-            newMeta.label = labelMap.get(info.activityInfo.name);
-            newMeta.timestamp = timestamp;
-            Drawable drawable = info.loadIcon(pm);
-            Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
-            Canvas canvas = new Canvas(bitmap);
-            drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
-            drawable.draw(canvas);
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
-            newMeta.icon = baos.toByteArray();
+            boolean isShouldLoad = false;
+            char prefix = meta.label.toUpperCase().charAt(0);
+            if (category == "123") {
+                if (prefix < 'A' || prefix > 'Z') {
+                    isShouldLoad = true;
+                }
+            } else {
+                if (prefix >= category.charAt(0) && prefix <= category.charAt(category.length() - 1)) {
+                    isShouldLoad = true;
+                }
+            }
 
-            metaMap.put(key, newMeta);
+            if (isShouldLoad) {
+                meta.timestamp = timestamp;
+                Drawable drawable = info.loadIcon(pm);
+                Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+                Canvas canvas = new Canvas(bitmap);
+                drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+                drawable.draw(canvas);
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
+                meta.icon = baos.toByteArray();
+            }
+
+            metaMap.put(key, meta);
         }
 
-        saveMetaMap(category);
+        saveMetaMap();
 
         sortedMap = new TreeMap();
         for (Map.Entry<String, Meta> metaPair : metaMap.entrySet()) {
@@ -126,12 +124,12 @@ public class InitDataTask extends NiceAsyncTask<Void, Void> {
         return null;
     }
 
-    private void loadMetaMap(String category) {
+    private void loadMetaMap() {
         metaMap = new HashMap();
         FileInputStream fis = null;
         ObjectInputStream iis = null;
         try {
-            fis = context.openFileInput("metaMap-" + category + ".bin");
+            fis = context.openFileInput("metaMap.bin");
             iis = new ObjectInputStream(fis);
             metaMap = (HashMap<String, Meta>) iis.readObject();
         } catch (Exception error) {
@@ -142,11 +140,11 @@ public class InitDataTask extends NiceAsyncTask<Void, Void> {
         }
     }
 
-    private void saveMetaMap(String category) {
+    private void saveMetaMap() {
         FileOutputStream fos = null;
         ObjectOutputStream oos = null;
         try {
-            fos = context.openFileOutput("metaMap-" + category + ".bin", context.MODE_PRIVATE);
+            fos = context.openFileOutput("metaMap.bin", context.MODE_PRIVATE);
             oos = new ObjectOutputStream(fos);
             oos.writeObject(metaMap);
         } catch (Exception error) {

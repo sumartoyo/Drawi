@@ -74,19 +74,35 @@ public class MainActivity extends AppCompatActivity {
                     showText("Error");
                     Log.i(TAG, Log.getStackTraceString(error));
                 } else {
-                    if (task.sortedMap.size() == 0) {
-                        showText("No " + category + " apps");
-                    } else {
-                        List<String> labels = new ArrayList();
-                        List<ResolveInfo> infos = new ArrayList();
-                        List<Bitmap> icons = new ArrayList();
-                        for (Map.Entry<String, String> sortedPair : task.sortedMap.entrySet()) {
-                            String key = sortedPair.getValue();
-                            Meta meta = task.metaMap.get(key);
+                    List<String> labels = new ArrayList();
+                    List<ResolveInfo> infos = new ArrayList();
+                    List<Bitmap> icons = new ArrayList();
+                    for (Map.Entry<String, String> sortedPair : task.sortedMap.entrySet()) {
+                        String key = sortedPair.getValue();
+                        Meta meta = task.metaMap.get(key);
+
+                        boolean isShouldLoad = false;
+                        char prefix = meta.label.toUpperCase().charAt(0);
+                        if (category == "123") {
+                            if (prefix < 'A' || prefix > 'Z') {
+                                isShouldLoad = true;
+                            }
+                        } else {
+                            if (prefix >= category.charAt(0) && prefix <= category.charAt(category.length() - 1)) {
+                                isShouldLoad = true;
+                            }
+                        }
+
+                        if (isShouldLoad) {
                             labels.add(meta.label);
                             infos.add(task.infoMap.get(key));
                             icons.add(BitmapFactory.decodeByteArray(meta.icon, 0, meta.icon.length));
                         }
+                    }
+
+                    if (labels.size() == 0) {
+                        showText("No " + category + " apps");
+                    } else {
                         ListAppAdapter adapter = new ListAppAdapter(activity, pm, labels, infos, icons);
                         listApps.setAdapter(adapter);
                     }
