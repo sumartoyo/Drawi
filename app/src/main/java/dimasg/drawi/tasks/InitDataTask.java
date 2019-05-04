@@ -58,7 +58,7 @@ public class InitDataTask extends NiceAsyncTask<Void, Void> {
             if (info.activityInfo.packageName.equals(context.getApplicationContext().getPackageName())) {
                 continue;
             }
-            infoMap.put(info.activityInfo.name, info);
+            infoMap.put(info.activityInfo.packageName + " " + info.activityInfo.name, info);
         }
 
         loadMetaMap();
@@ -87,19 +87,7 @@ public class InitDataTask extends NiceAsyncTask<Void, Void> {
             }
             meta.label = info.loadLabel(pm).toString();
 
-            boolean isShouldLoad = false;
-            char prefix = meta.label.toUpperCase().charAt(0);
-            if (category == "123") {
-                if (prefix < 'A' || prefix > 'Z') {
-                    isShouldLoad = true;
-                }
-            } else {
-                if (prefix >= category.charAt(0) && prefix <= category.charAt(category.length() - 1)) {
-                    isShouldLoad = true;
-                }
-            }
-
-            if (isShouldLoad) {
+            if (checkIsLabelInCategory(category, meta.label)) {
                 meta.timestamp = timestamp;
                 Drawable drawable = info.loadIcon(pm);
                 Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
@@ -118,7 +106,11 @@ public class InitDataTask extends NiceAsyncTask<Void, Void> {
 
         sortedMap = new TreeMap();
         for (Map.Entry<String, Meta> metaPair : metaMap.entrySet()) {
-            sortedMap.put(metaPair.getValue().label.toLowerCase(), metaPair.getKey());
+            String label = metaPair.getValue().label.toLowerCase();
+            if (checkIsLabelInCategory(category, label)) {
+                String key = metaPair.getKey();
+                sortedMap.put(label + "   " + key, key);
+            }
         }
 
         return null;
@@ -153,5 +145,19 @@ public class InitDataTask extends NiceAsyncTask<Void, Void> {
             try { oos.close(); } catch (Exception error) {}
             try { fos.close(); } catch (Exception error) {}
         }
+    }
+
+    public static boolean checkIsLabelInCategory(String category, String label) {
+        char prefix = label.toUpperCase().charAt(0);
+        if (category == "123") {
+            if (prefix < 'A' || prefix > 'Z') {
+                return true;
+            }
+        } else {
+            if (prefix >= category.charAt(0) && prefix <= category.charAt(category.length() - 1)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

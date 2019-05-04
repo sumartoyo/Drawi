@@ -1,21 +1,17 @@
 package dimasg.drawi;
 
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import dimasg.drawi.schemes.Meta;
 import dimasg.drawi.schemes.NiceAsyncTask;
@@ -80,24 +76,9 @@ public class MainActivity extends AppCompatActivity {
                     for (Map.Entry<String, String> sortedPair : task.sortedMap.entrySet()) {
                         String key = sortedPair.getValue();
                         Meta meta = task.metaMap.get(key);
-
-                        boolean isShouldLoad = false;
-                        char prefix = meta.label.toUpperCase().charAt(0);
-                        if (category == "123") {
-                            if (prefix < 'A' || prefix > 'Z') {
-                                isShouldLoad = true;
-                            }
-                        } else {
-                            if (prefix >= category.charAt(0) && prefix <= category.charAt(category.length() - 1)) {
-                                isShouldLoad = true;
-                            }
-                        }
-
-                        if (isShouldLoad) {
-                            labels.add(meta.label);
-                            infos.add(task.infoMap.get(key));
-                            icons.add(BitmapFactory.decodeByteArray(meta.icon, 0, meta.icon.length));
-                        }
+                        labels.add(meta.label);
+                        infos.add(task.infoMap.get(key));
+                        icons.add(BitmapFactory.decodeByteArray(meta.icon, 0, meta.icon.length));
                     }
 
                     if (labels.size() == 0) {
